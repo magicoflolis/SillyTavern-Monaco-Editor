@@ -36,8 +36,8 @@ https://github.com/magicoflolis/SillyTavern-Monaco-Editor
 The `monaco` object is **global**, `globalThis.monaco`.
 
 ```js
-if (typeof globalThis.monaco !== "undefined") {
-  // Do work
+if (typeof globalThis.monaco !== 'undefined') {
+    // Do work
 }
 ```
 
@@ -69,7 +69,7 @@ class CodeViewMonaco extends HTMLElement {
 
 const cv = document.createElement('code-view-monaco');
 
-document.body.appendChild(cv);
+document.body.prepend(cv);
 
 // (Optional) Validate if `CodeViewMonaco.createEditor()` exists
 //if (typeof cv.createEditor === "function") {
@@ -94,7 +94,7 @@ console.log(editor);
 ```js
 const cv = document.createElement('code-view-monaco');
 
-document.body.appendChild(cv);
+document.body.prepend(cv);
 
 // EditorOptions
 const options = {
@@ -121,41 +121,66 @@ editor.onDidBlurEditorText(shortcutFN);
 > Bind to an existing textarea element
 
 ```js
-const cv = document.createElement('code-view-monaco');
-const textarea = document.createElement('textarea');
+function monacoExample() {
+    const textarea = document.getElementById('monaco-demo');
 
-textarea.value = 'Hello World!';
+    textarea.value = '{"thinking": {"type": "enabled"}}';
 
-document.body.append(cv, textarea);
+    const cv = document.createElement('code-view-monaco');
 
-// Bind `textarea`
-cv.textElement = textarea;
+    // (Optional) override editor language
+    cv.dataset.language = 'yaml';
 
-// EditorOptions
-const options = {
-    value: textarea.value
-};
+    // Bind `textarea`
+    cv.textElement = textarea;
 
-const onEditorBlur = () => {
-    textarea.value = editor.getValue();
-    // If `textarea` has blur event listener
-    textarea.dispatchEvent(new Event('blur'));
-    // If `textarea` has input event listener
-    textarea.dispatchEvent(new Event('input'));
-};
+    // EditorOptions
+    const options = {
+        value: textarea.value
+    };
 
-// Keyboard shortcut: Ctrl+S / Cmd+S → save and close
-const shortcutFN = () => {
-    onEditorBlur(); // trigger save
-    cv.remove();
-};
+    const onEditorBlur = () => {
+        textarea.value = editor.getValue();
+        // If `textarea` has blur event listener
+        textarea.dispatchEvent(new Event('blur'));
+        // If `textarea` has input event listener
+        textarea.dispatchEvent(new Event('input'));
+    };
 
-// Create a Monaco instance
-const editor = cv.createEditor(options, shortcutFN);
+    // Keyboard shortcut: Ctrl+S / Cmd+S → save and close
+    const shortcutFN = () => {
+        onEditorBlur(); // trigger save
+        cv.remove();
+    };
 
-// When focus away from editor,
-// update `textarea.value` & trigger events
-editor.onDidBlurEditorText(onEditorBlur);
+    // SillyTavern Popup
+    const { Popup, POPUP_TYPE, POPUP_RESULT } = SillyTavern.getContext();
+    const popup = new Popup(cv, POPUP_TYPE.TEXT, '', {
+        wide: true,
+        large: true,
+        onClosing: async () => {
+            if (popup.result === POPUP_RESULT.AFFIRMATIVE) {
+                // trigger save
+                onEditorBlur();
+            }
+            cv.remove();
+            return true;
+        }
+    });
+    popup.show();
+
+    // Create a Monaco instance
+    const editor = cv.createEditor(options, shortcutFN);
+
+    // When focus away from editor,
+    // update `textarea.value` & trigger events
+    editor.onDidBlurEditorText(onEditorBlur);
+
+    // Change focus
+    editor.focus();
+}
+
+monacoExample();
 ```
 
 ---
