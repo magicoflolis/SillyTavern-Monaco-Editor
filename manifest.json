@@ -1,0 +1,11 @@
+{
+  "display_name": "Monaco Editor",
+  "loading_order": 0,
+  "requires": [],
+  "optional": [],
+  "js": "index.js",
+	"version": "1.0.0",
+  "author": "magicoflolis",
+  "homePage": "https://github.com/magicoflolis/SillyTavern-Monaco-Editor",
+  "auto_update": true
+}
