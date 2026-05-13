@@ -890,7 +890,7 @@ eventSource.on(eventTypes.APP_READY, async () => {
         const textarea = qs('textarea.text_pole', elem);
         if (!textarea) continue;
         const tmpBtn = make('button', 'menu_button flex1', {
-            textContent: 'Open in Monaco',
+            textContent: 'Monaco',
             style: 'margin: 0px;',
             dataset: {
                 insertedBy: MODULE_NAME
